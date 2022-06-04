@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  goapp:
+    build: ./goapp
+    environment:
+      AMQP_URI: amqp://$RABBITMQ_USER:$RABBITMQ_PASS@$RABBITMQ_HOSTNAME
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  pyapp:
+    build: ./pyapp
+    environment:
+      AMQP_HOST: $RABBITMQ_HOSTNAME
+      AMQP_USER: $RABBITMQ_USER
+      AMQP_PASS: $RABBITMQ_PASS
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+
+  rabbitmq:
+    hostname: $RABBITMQ_HOSTNAME
+    image: rabbitmq:3-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=$RABBITMQ_USER
+      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_PASS
+    ports:
+      - 5673:5673
+      - 5672:5672
+      - 80:15672
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 15s
+      retries: 5
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/mnesia/
+
+volumes:
+  rabbitmq_data:
