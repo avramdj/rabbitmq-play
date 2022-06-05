@@ -7,6 +7,7 @@ def callback(ch, method, properties, body):
 
 
 if __name__ == "__main__":
+    amqp_host = os.environ["AMQP_HOST"]
     amqp_user = os.environ["AMQP_USER"]
     amqp_pass = os.environ["AMQP_PASS"]
 
