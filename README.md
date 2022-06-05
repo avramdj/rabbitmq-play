@@ -1,1 +1,1 @@
-# rabbitmq-example
+# RabbitMQ Hello World
