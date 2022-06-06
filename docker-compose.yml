@@ -1,18 +1,18 @@
 version: "3.9"
 
 services:
-  goapp:
-    build: ./goapp
+  sender:
+    build: ./sender
     environment:
-      AMQP_URI: amqp://$RABBITMQ_USER:$RABBITMQ_PASS@$RABBITMQ_HOSTNAME
+      AMQP_URI: amqp://$RABBITMQ_USER:$RABBITMQ_PASS@rabbit
     depends_on:
       rabbitmq:
         condition: service_healthy
 
-  pyapp:
-    build: ./pyapp
+  receiver:
+    build: ./receiver
     environment:
-      AMQP_HOST: $RABBITMQ_HOSTNAME
+      AMQP_HOST: rabbit
       AMQP_USER: $RABBITMQ_USER
       AMQP_PASS: $RABBITMQ_PASS
     depends_on:
@@ -21,7 +21,7 @@ services:
 
 
   rabbitmq:
-    hostname: $RABBITMQ_HOSTNAME
+    hostname: rabbit
     image: rabbitmq:3-management-alpine
     environment:
       - RABBITMQ_DEFAULT_USER=$RABBITMQ_USER
@@ -29,7 +29,7 @@ services:
     ports:
       - 5673:5673
       - 5672:5672
-      - 80:15672
+      - 80:15672  # management plugin gui
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
